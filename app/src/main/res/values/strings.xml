@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">Tinkoff Fintech School</string>
+    <string name="ok_button">OK</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="messenger_button">Отправить текст в мессенджер</string>
+    <string name="activity_button">Отправить текст во второе активити</string>
+    <string name="enter_text">Введите текст</string>
+    <string name="flag">Флаг:</string>
+    <string name="NO_FLAG">NO_FLAG</string>
+    <string name="NEW_TASK">FLAG_ACTIVITY_NEW_TASK</string>
+    <string name="SINGLE_TOP">FLAG_ACTIVITY_SINGLE_TOP</string>
+    <string name="CLEAR_TOP">FLAG_ACTIVITY_CLEAR_TOP</string>
+    <string name="NO_HISTORY">FLAG_ACTIVITY_NO_HISTORY</string>
+    <string name="REORDER_TO_FRONT">FLAG_ACTIVITY_REORDER_TO_FRONT</string>
+    <string name="CLEAR_TASK">FLAG_ACTIVITY_CLEAR_TASK</string>
+    <string name="TASK_ON_HOME">FLAG_ACTIVITY_TASK_ON_HOME</string>
+    <string name="red">Red Activity</string>
+    <string name="green">Green Activity</string>
+    <string name="blue">Blue Activity</string>
+    <string name="openWithFlags">Открыть активити с флагами</string>
 </resources>
