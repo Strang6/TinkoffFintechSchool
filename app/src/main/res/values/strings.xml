@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Tinkoff Fintech School</string>
+    <string name="ok_button">OK</string>
+    <string name="multiplication_button">*</string>
+    <string name="division_button">/</string>
+    <string name="addition_button">+</string>
+    <string name="subtraction_button">-</string>
+    <string name="operation">операция</string>
+    <string name="result">результат</string>
+    <string name="firstOperandButton">операнд 1</string>
+    <string name="secondOperandButton">операнд 2</string>
+    <string name="operationButton">операция</string>
+    <string name="resultButton">результат</string>
+    <string name="enteredOperation">Выбранная операция:</string>
 </resources>
