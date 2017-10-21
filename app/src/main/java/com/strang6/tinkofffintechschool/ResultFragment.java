@@ -14,6 +14,9 @@ import android.widget.TextView;
  */
 public class ResultFragment extends Fragment {
 
+    private static String firstOperandKey = "firstOperand",
+                          secondOperandKey = "secondOperand",
+                          operationKey = "operation";
 
     public ResultFragment() {
     }
@@ -32,11 +35,21 @@ public class ResultFragment extends Fragment {
     public static ResultFragment newInstance(double firstOperand, double secondOperand, String operation) {
         ResultFragment fragment = new ResultFragment();
         Bundle args = new Bundle();
-        args.putDouble("firstOperand", firstOperand);
-        args.putDouble("secondOperand", secondOperand);
-        args.putString("operation", operation);
+        args.putDouble(firstOperandKey, firstOperand);
+        args.putDouble(secondOperandKey, secondOperand);
+        args.putString(operationKey, operation);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public void setArguments(double firstOperand, double secondOperand, String operation) {
+        Bundle args = getArguments();
+        args.clear();
+        Bundle bundle = new Bundle();
+        bundle.putDouble(firstOperandKey, firstOperand);
+        bundle.putDouble(secondOperandKey, secondOperand);
+        bundle.putString(operationKey, operation);
+        args.putAll(bundle);
     }
 
     public String getExpression() {
@@ -58,15 +71,15 @@ public class ResultFragment extends Fragment {
 
 
     public String getOperation() {
-        return getArguments().getString("operation");
+        return getArguments().getString(operationKey);
     }
 
     public double getFirstOperand() {
-        return getArguments().getDouble("firstOperand");
+        return getArguments().getDouble(firstOperandKey);
     }
 
     public double getSecondOperand() {
-        return getArguments().getDouble("secondOperand");
+        return getArguments().getDouble(secondOperandKey);
     }
 
     public double getResult() {

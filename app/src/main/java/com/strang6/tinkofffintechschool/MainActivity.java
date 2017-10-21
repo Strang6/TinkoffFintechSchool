@@ -2,6 +2,7 @@ package com.strang6.tinkofffintechschool;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.View;
@@ -14,7 +15,6 @@ public class MainActivity extends FragmentActivity
     private Button resultButton, operationButton, secondOperandButton;
     private double firstOperand, secondOperand;
     private String operation;
-    private boolean isChangeArgs = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,22 +34,23 @@ public class MainActivity extends FragmentActivity
     }
 
     public void onClickFragmentButton(View view) {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         switch (view.getId()) {
             case R.id.firstOperandButton: {
-                Fragment firstOperandFragment = getSupportFragmentManager().findFragmentByTag("firstOperandFragment");
+                Fragment firstOperandFragment = fragmentManager.findFragmentByTag("firstOperandFragment");
                 fragmentTransaction.replace(R.id.fragment_container, firstOperandFragment);
                 break;
             }
             case R.id.secondOperandButton: {
-                Fragment secondOperandFragment = getSupportFragmentManager().findFragmentByTag("secondOperandFragment");
+                Fragment secondOperandFragment = fragmentManager.findFragmentByTag("secondOperandFragment");
                 if (secondOperandFragment == null)
                     secondOperandFragment = new OperandFragment();
                 fragmentTransaction.replace(R.id.fragment_container, secondOperandFragment, "secondOperandFragment");
                 break;
             }
             case R.id.operationButton: {
-                Fragment operationFragment = getSupportFragmentManager().findFragmentByTag("operationFragment");
+                Fragment operationFragment = fragmentManager.findFragmentByTag("operationFragment");
                 if (operationFragment == null)
                     operationFragment = new OperationFragment();
                 fragmentTransaction.replace(R.id.fragment_container, operationFragment, "operationFragment");
@@ -60,10 +61,12 @@ public class MainActivity extends FragmentActivity
                     String error = "Делить на 0 нельзя, выберите другую операцию или введите другой операнд2";
                     Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
                 } else {
-                    Fragment resultFragment = getSupportFragmentManager().findFragmentByTag("resultFragment");
-                    if (resultFragment == null || isChangeArgs) {
+                    ResultFragment resultFragment = (ResultFragment)getSupportFragmentManager().findFragmentByTag("resultFragment");
+                    if (resultFragment == null) {
                         resultFragment = ResultFragment.newInstance(firstOperand, secondOperand, operation);
-                        isChangeArgs = false;
+                    }
+                    else {
+                        resultFragment.setArguments(firstOperand, secondOperand, operation);
                     }
                     fragmentTransaction.replace(R.id.fragment_container, resultFragment, "resultFragment");
                 }
@@ -75,7 +78,6 @@ public class MainActivity extends FragmentActivity
 
     @Override
     public void onOperandEntered(double operand) {
-        isChangeArgs = true;
         Fragment firstOperandFragment = getSupportFragmentManager().findFragmentByTag("firstOperandFragment");
         Fragment secondOperandFragment = getSupportFragmentManager().findFragmentByTag("secondOperandFragment");
         if (firstOperandFragment.isResumed()) {
@@ -94,7 +96,6 @@ public class MainActivity extends FragmentActivity
     @Override
     public void onOperationEntered(String operation) {
         this.operation = operation;
-        isChangeArgs = true;
         if (operation.equals("/") && secondOperand == 0) {
             String error = "Делить на 0 нельзя, выберите другую операцию или введите другой операнд2";
             Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
@@ -111,7 +112,6 @@ public class MainActivity extends FragmentActivity
         outState.putDouble("firstOperand", firstOperand);
         outState.putDouble("secondOperand", secondOperand);
         outState.putString("operation", operation);
-        outState.putBoolean("isChangeArgs", isChangeArgs);
         outState.putBoolean("isResultButtonEnabled", resultButton.isEnabled());
         outState.putBoolean("isOperationButtonEnabled", operationButton.isEnabled());
         outState.putBoolean("isSecondOperandButtonEnabled", secondOperandButton.isEnabled());
@@ -123,7 +123,6 @@ public class MainActivity extends FragmentActivity
         firstOperand = savedInstanceState.getDouble("firstOperand");
         secondOperand = savedInstanceState.getDouble("secondOperand");
         operation = savedInstanceState.getString("operation");
-        isChangeArgs = savedInstanceState.getBoolean("isChangeArgs");
         resultButton.setEnabled(savedInstanceState.getBoolean("isResultButtonEnabled"));
         operationButton.setEnabled(savedInstanceState.getBoolean("isOperationButtonEnabled"));
         secondOperandButton.setEnabled(savedInstanceState.getBoolean("isSecondOperandButtonEnabled"));
