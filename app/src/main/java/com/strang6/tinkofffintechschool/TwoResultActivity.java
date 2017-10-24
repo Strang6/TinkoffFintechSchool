@@ -4,87 +4,107 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
+import java.util.concurrent.Executor;
+
 public class TwoResultActivity extends AppCompatActivity {
+
+    private static String TAG = "myTag";
 
     private TextView authorTextView, dobTextView;
     private final int AUTHOR_MESSAGE = 0, DOB_MESSAGE = 1;
     private final String AUTHOR_KEY = "author", DOB_KEY = "dob";
+    private String author, dob;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_two_result);
 
+        Log.d(TAG, "onCreate");
         authorTextView = (TextView) findViewById(R.id.authorTextView);
         dobTextView = (TextView) findViewById(R.id.dobTextView);
 
-        if (savedInstanceState != null) {
-            authorTextView.setText(savedInstanceState.getString(AUTHOR_KEY));
-            dobTextView.setText(savedInstanceState.getString(DOB_KEY));
+        if (savedInstanceState != null &&
+                (author = savedInstanceState.getString(AUTHOR_KEY)) != null &&
+                (dob = savedInstanceState.getString(DOB_KEY)) != null) {
+            authorTextView.setText(author);
+            dobTextView.setText(dob);
         } else {
-            Thread thread1 = new Thread(loadAuthor);
-            thread1.start();
-            Thread thread2 = new Thread(loadDOB);
-            thread2.start();
+            loadAuthorInfoThread.start();
         }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        outState.putString(AUTHOR_KEY, authorTextView.getText().toString());
-        outState.putString(DOB_KEY, dobTextView.getText().toString());
+        outState.putString(AUTHOR_KEY, author);
+        outState.putString(DOB_KEY, dob);
     }
 
-    Runnable loadAuthor = new Runnable() {
-        private String author = "Александр Сергеевич Пушкин";
+    @Override
+    protected void onStop() {
+        loadAuthorInfoThread.interrupt();
+        super.onStop();
+        Log.d(TAG, "onStop");
+    }
+
+    private Thread loadAuthorInfoThread = new Thread() {
+        private String [] authorInfo = {"Александр Сергеевич Пушкин",
+                "(26 мая [6 июня] 1799, Москва — 29 января [10 февраля] 1837, Санкт-Петербург)"};
         @Override
         public void run() {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            Log.d(TAG, "run");
+            if (interrupted())
+                return;
             Message message = handler.obtainMessage();
             message.what = AUTHOR_MESSAGE;
             Bundle bundle = new Bundle();
-            bundle.putString(AUTHOR_KEY,author);
+            bundle.putString(AUTHOR_KEY,authorInfo[0]);
+            if (interrupted())
+                return;
             message.setData(bundle);
+            if (interrupted())
+                return;
             handler.sendMessage(message);
-        }
-    };
-
-    Runnable loadDOB = new Runnable() {
-        private String dob = "(26 мая [6 июня] 1799, Москва — 29 января [10 февраля] 1837, Санкт-Петербург)";
-
-        @Override
-        public void run() {
+            if (interrupted())
+                return;
             try {
-                Thread.sleep(5000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            Message message = handler.obtainMessage();
+            if (interrupted())
+                return;
+            message = handler.obtainMessage();
             message.what = DOB_MESSAGE;
-            Bundle bundle = new Bundle();
-            bundle.putString(DOB_KEY, dob);
+            bundle = new Bundle();
+            bundle.putString(DOB_KEY,authorInfo[1]);
             message.setData(bundle);
+            if (interrupted())
+                return;
             handler.sendMessage(message);
         }
     };
 
-    Handler handler = new Handler() {
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            Log.d(TAG, "handleMessage");
             Bundle bundle = msg.getData();
             switch (msg.what) {
                 case AUTHOR_MESSAGE:
-                    authorTextView.setText(bundle.getString(AUTHOR_KEY));
+                    Log.d(TAG, "AUTHOR_MESSAGE");
+                    author = bundle.getString(AUTHOR_KEY);
+                    authorTextView.setText(author);
                     break;
                 case DOB_MESSAGE:
-                    dobTextView.setText(bundle.getString(DOB_KEY));
+                    Log.d(TAG, "DOB_MESSAGE");
+                    dob = bundle.getString(DOB_KEY);
+                    dobTextView.setText(dob);
                     break;
             }
         }

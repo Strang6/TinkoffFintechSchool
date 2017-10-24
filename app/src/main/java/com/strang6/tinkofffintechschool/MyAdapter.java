@@ -17,10 +17,6 @@ public class MyAdapter extends RecyclerView.Adapter <MyAdapter.ViewHolder> {
         this.dataSet = dataSet;
     }
 
-    public String [] getDataSet() {
-        return dataSet;
-    }
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView textView;
         public ViewHolder(TextView view) {
