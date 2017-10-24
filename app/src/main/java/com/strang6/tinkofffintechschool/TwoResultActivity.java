@@ -73,7 +73,7 @@ public class TwoResultActivity extends AppCompatActivity {
             if (interrupted())
                 return;
             try {
-                Thread.sleep(10000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
