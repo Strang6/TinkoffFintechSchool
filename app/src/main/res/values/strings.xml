@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Tinkoff Fintech School</string>
+    <string name="list">Список элементов</string>
+    <string name="two_result">Два результата</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
