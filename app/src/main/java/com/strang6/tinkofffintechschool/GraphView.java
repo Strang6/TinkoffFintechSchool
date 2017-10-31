@@ -1,0 +1,214 @@
+package com.strang6.tinkofffintechschool;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.util.AttributeSet;
+import android.view.View;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+
+/**
+ * Created by Strang6 on 29.10.2017.
+ */
+
+public class GraphView extends View {
+    private Map<Float, Float> coordinates;
+    private int graphColor;
+    private boolean isSmoothing, isGrid;
+    private String xSign, ySign;
+    private Float xStep, yStep;
+    private static final float GRAPH_SMOOTHNESS = 0.15f;
+
+    public GraphView(Context context) {
+        super(context);
+    }
+
+    public GraphView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public void setCoordinates(Map<Float, Float> coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public void setColor(int graphColor) {
+        this.graphColor = graphColor;
+    }
+
+    public void setSmoothing(boolean isSmoothing) {
+        this.isSmoothing = isSmoothing;
+    }
+
+    public void setStep(float xStep, float yStep) {
+        this.xStep = xStep;
+        this.yStep = yStep;
+    }
+
+    public void setGrid(boolean isGrid) {
+        this.isGrid = isGrid;
+    }
+
+    public void setSign(String xSign, String ySign) {
+        this.xSign = xSign;
+        this.ySign = ySign;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        drawCoordinates(canvas);
+
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(graphColor);
+        paint.setStrokeWidth(5);
+
+        Path path;
+        if (isSmoothing) {
+            path = createSmoothPath();
+        } else {
+            path = createPath();
+        }
+
+        canvas.drawPath(path, paint);
+    }
+
+    private Path createSmoothPath() {
+        int size = coordinates.size();
+        Float[] x = new Float[size], y = new Float[size];
+        x = coordinates.keySet().toArray(x);
+        y = coordinates.values().toArray(y);
+
+        Path path = new Path();
+        path.moveTo(getPosX(x[0]), getPosY(y[0]));
+        for (int i = 0; i < size - 1; i++) {
+            float currentX = getPosX(x[i]);
+            float currentY = getPosY(y[i]);
+            float nextX = getPosX(x[i + 1]);
+            float nextY = getPosY(y[i + 1]);
+
+            float startDiffX = nextX - getPosX(x[si(i - 1)]);
+            float startDiffY = nextY - getPosY(y[si(i - 1)]);
+            float endDiffX = getPosX(x[si(i + 2)]) - currentX;
+            float endDiffY = getPosY(y[si(i + 2)]) - currentY;
+
+            float firstControlX = currentX + (GRAPH_SMOOTHNESS * startDiffX);
+            float firstControlY = currentY + (GRAPH_SMOOTHNESS * startDiffY);
+            float secondControlX = nextX - (GRAPH_SMOOTHNESS * endDiffX);
+            float secondControlY = nextY - (GRAPH_SMOOTHNESS * endDiffY);
+
+            path.cubicTo(firstControlX, firstControlY, secondControlX, secondControlY, nextX, nextY);
+        }
+        return path;
+    }
+
+    private int si(int i) {
+        if (i > coordinates.size() - 1) {
+            return coordinates.size() - 1;
+        } else if (i < 0) {
+            return 0;
+        }
+        return i;
+    }
+
+    private Path createPath() {
+        Path path = new Path();
+        Iterator<Float> x = coordinates.keySet().iterator();
+        Iterator<Float> y = coordinates.values().iterator();
+        path.moveTo(getPosX(x.next()), getPosY(y.next()));
+        while (x.hasNext()) {
+            path.lineTo(getPosX(x.next()), getPosY(y.next()));
+        }
+        return path;
+    }
+
+    private void drawCoordinates(Canvas canvas) {
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(Color.BLACK);
+        paint.setStrokeWidth(3);
+        float textSize = 48;
+        paint.setTextSize(textSize);
+        float left = getPaddingLeft(), top = getPaddingTop();
+        float right = getWidth() - getPaddingRight();
+        float bottom = getHeight() - getPaddingBottom();
+        canvas.drawRect(left, top, right, bottom, paint);
+        if (xSign != null && ySign != null) {
+            canvas.drawText(xSign, right - textSize, bottom, paint);
+            canvas.drawText(ySign, left, top + textSize, paint);
+        }
+        if (xStep != null && yStep != null) {
+            Paint stepPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            stepPaint.setStrokeWidth(2);
+            stepPaint.setStyle(Paint.Style.STROKE);
+            stepPaint.setColor(Color.DKGRAY);
+            float stepTextSize = 40;
+            stepPaint.setTextSize(stepTextSize);
+            float lineSize = 24;
+            float maxX = getMaxX();
+            float x = getMinX();
+            float posX = getPosX(x);
+            while (x <= maxX) {
+                canvas.drawLine(posX, bottom - lineSize, posX, bottom + lineSize, stepPaint);
+                canvas.drawText(Float.toString(x), posX, bottom + stepTextSize, stepPaint);
+                if (isGrid) {
+                    canvas.drawLine(posX, bottom, posX, top, stepPaint);
+                }
+                x += xStep;
+                posX = getPosX(x);
+            }
+            float maxY = getMaxY();
+            float y = getMinY();
+            float posY = getPosY(y);
+            while (y <= maxY) {
+                canvas.drawLine(left - lineSize, posY, left + lineSize, posY, stepPaint);
+                String yText = Float.toString(y);
+                canvas.drawText(yText, left - stepTextSize * (yText.length() - 1.5f), posY, stepPaint);
+                if (isGrid) {
+                    canvas.drawLine(left, posY, right, posY, stepPaint);
+                }
+                y += yStep;
+                posY = getPosY(y);
+            }
+        }
+    }
+
+    private float getMaxX() {
+        return Collections.max(coordinates.keySet());
+    }
+
+    private float getMinX() {
+        return Collections.min(coordinates.keySet());
+    }
+
+    private float getMaxY() {
+        return Collections.max(coordinates.values());
+    }
+
+    private float getMinY() {
+        return Collections.min(coordinates.values());
+    }
+
+    private float getPosY(float y) {
+        float height = getHeight() - getPaddingTop() - getPaddingBottom();
+        float maxY = getMaxY();
+        float minY = getMinY();
+        float posY = height / (maxY - minY) * (y - minY);
+        posY = height - posY + getPaddingTop();
+        return posY;
+    }
+
+    private float getPosX(float x) {
+        float width = getWidth() - getPaddingLeft() - getPaddingRight();
+        float maxX = getMaxX();
+        float minX = getMinX();
+        float posX = width / (maxX - minX) * (x - minX);
+        posX += getPaddingLeft();
+        return posX;
+    }
+
+}

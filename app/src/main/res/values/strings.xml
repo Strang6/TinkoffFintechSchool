@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Tinkoff Fintech School</string>
+    <string name="okButton">OK</string>
+    <string name="graphColor">Цвет графика</string>
+    <string name="pointList">Список точек:</string>
+    <string name="smoothing">Сглаживание</string>
+    <string name="x">x</string>
+    <string name="y">y</string>
+    <string name="add">Добавить:</string>
+    <string name="sign">Подпись осей</string>
+    <string name="steps">Шаги</string>
+    <string name="grid">Координатная сетка</string>
 </resources>

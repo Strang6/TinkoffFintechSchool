@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.strang6.tinkofffintechschool.GraphActivity">
+
+    <com.strang6.tinkofffintechschool.GraphView
+        android:id="@+id/graphView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="60dp"
+        android:paddingBottom="45dp"
+        android:paddingRight="40dp"
+        android:paddingTop="40dp"
+        android:background="@color/colorWhite" />
+
+</LinearLayout>
