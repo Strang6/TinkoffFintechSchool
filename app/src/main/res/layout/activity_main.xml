@@ -42,23 +42,23 @@
                 android:id="@+id/signCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:onClick="onVisibilityClick"
                 android:paddingRight="10dp"
-                android:text="@string/sign"
-                android:onClick="onVisibilityClick"/>
+                android:text="@string/sign" />
 
             <EditText
                 android:id="@+id/xSignEditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/x"
-                android:visibility="invisible"/>
+                android:visibility="invisible" />
 
             <EditText
                 android:id="@+id/ySignEditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/y"
-                android:visibility="invisible"/>
+                android:visibility="invisible" />
 
         </LinearLayout>
 
@@ -66,13 +66,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-        <CheckBox
-            android:id="@+id/stepsCheckBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="10dp"
-            android:text="@string/steps"
-            android:onClick="onVisibilityClick"/>
+
+            <CheckBox
+                android:id="@+id/stepsCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onVisibilityClick"
+                android:paddingRight="10dp"
+                android:text="@string/steps" />
 
             <EditText
                 android:id="@+id/xStepEditText"
@@ -97,8 +98,8 @@
             android:id="@+id/gridCheckBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/grid"
-            android:enabled="false"/>
+            android:enabled="false"
+            android:text="@string/grid" />
 
         <TextView
             android:layout_width="wrap_content"

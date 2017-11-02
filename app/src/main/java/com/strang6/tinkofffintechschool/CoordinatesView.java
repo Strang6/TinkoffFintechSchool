@@ -2,7 +2,6 @@ package com.strang6.tinkofffintechschool;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
-import android.text.Layout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.EditText;
@@ -12,7 +11,7 @@ import android.widget.LinearLayout;
  * Created by Strang6 on 30.10.2017.
  */
 
-public class CoordinatesView extends LinearLayout{
+public class CoordinatesView extends LinearLayout {
     public CoordinatesView(Context context) {
         this(context, null);
     }
