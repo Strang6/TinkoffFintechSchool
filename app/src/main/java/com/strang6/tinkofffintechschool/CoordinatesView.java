@@ -35,6 +35,16 @@ public class CoordinatesView extends LinearLayout{
         return Float.parseFloat(x);
     }
 
+    public void setCoordinateY(float y) {
+        EditText yEditText = (EditText) findViewById(R.id.yEditText);
+        yEditText.setText(Float.toString(y));
+    }
+
+    public void setCoordinateX(float x) {
+        EditText xEditText = (EditText) findViewById(R.id.xEditText);
+        xEditText.setText(Float.toString(x));
+    }
+
     public Float getCoordinateY() {
         EditText yEditText = (EditText) findViewById(R.id.yEditText);
         String y = yEditText.getText().toString();

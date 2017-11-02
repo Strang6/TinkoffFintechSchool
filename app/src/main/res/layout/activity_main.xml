@@ -138,6 +138,10 @@
                 <com.strang6.tinkofffintechschool.CoordinatesView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
+
+                <com.strang6.tinkofffintechschool.CoordinatesView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
         </LinearLayout>

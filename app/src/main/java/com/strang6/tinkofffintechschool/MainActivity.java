@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
 
+import java.util.Iterator;
 import java.util.TreeMap;
 
 public class MainActivity extends AppCompatActivity implements ColorPickerDialogListener {
@@ -35,14 +37,37 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         yStepEditText = (EditText) findViewById(R.id.yStepEditText);
         stepsCheckBox = (CheckBox) findViewById(R.id.stepsCheckBox);
         gridCheckBox = (CheckBox) findViewById(R.id.gridCheckBox);
-        if (savedInstanceState != null) {
-            boolean isSign = savedInstanceState.getBoolean("isSign");
-            xSignEditText.setVisibility(isSign? View.VISIBLE: View.INVISIBLE);
-            ySignEditText.setVisibility(isSign? View.VISIBLE: View.INVISIBLE);
-            boolean isStep = savedInstanceState.getBoolean("isStep");
-            xStepEditText.setVisibility(isStep? View.VISIBLE: View.INVISIBLE);
-            yStepEditText.setVisibility(isStep? View.VISIBLE: View.INVISIBLE);
-            gridCheckBox.setEnabled(isStep);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        boolean isSign = savedInstanceState.getBoolean("isSign");
+        xSignEditText.setVisibility(isSign ? View.VISIBLE : View.INVISIBLE);
+        ySignEditText.setVisibility(isSign ? View.VISIBLE : View.INVISIBLE);
+
+        boolean isStep = savedInstanceState.getBoolean("isStep");
+        xStepEditText.setVisibility(isStep ? View.VISIBLE : View.INVISIBLE);
+        yStepEditText.setVisibility(isStep ? View.VISIBLE : View.INVISIBLE);
+        gridCheckBox.setEnabled(isStep);
+
+        TreeMap<Float, Float> coordinates = (TreeMap<Float, Float>) savedInstanceState.getSerializable("coordinates");
+        if (coordinates != null) {
+            int count = coordinates.size() - coordinatesLayout.getChildCount();
+            for (; count > 0; count--) {
+                coordinatesLayout.addView(new CoordinatesView(this));
+            }
+            Iterator<Float> xIterator = coordinates.keySet().iterator();
+            Iterator<Float> yIterator = coordinates.values().iterator();
+            CoordinatesView coordinatesView;
+            int i = 0;
+            while (xIterator.hasNext() && yIterator.hasNext()) {
+                coordinatesView = (CoordinatesView) coordinatesLayout.getChildAt(i);
+                coordinatesView.setCoordinateX(xIterator.next());
+                coordinatesView.setCoordinateY(yIterator.next());
+                i++;
+            }
         }
     }
 
@@ -50,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean("isSign", signCheckBox.isChecked());
         outState.putBoolean("isStep", stepsCheckBox.isChecked());
+        outState.putSerializable("coordinates", getCoordinates());
         super.onSaveInstanceState(outState);
     }
 
@@ -130,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
 
     public void deleteCoordinatesOnClick(View view) {
         int count = coordinatesLayout.getChildCount();
-        if (count != 1) {
+        if (count != 2) {
             coordinatesLayout.removeViewAt(count - 1);
         }
     }

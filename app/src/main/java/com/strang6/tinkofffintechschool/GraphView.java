@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import java.util.Collections;
@@ -22,14 +23,16 @@ public class GraphView extends View {
     private boolean isSmoothing, isGrid;
     private String xSign, ySign;
     private Float xStep, yStep;
-    private static final float GRAPH_SMOOTHNESS = 0.15f;
+    private static final float GRAPH_SMOOTHNESS = 0.15f, textSize = 48, stepTextSize = 40;
+    private Paint graphPaint, coordinatesPaint, stepPaint;
 
     public GraphView(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public GraphView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
     public void setCoordinates(Map<Float, Float> coordinates) {
@@ -58,23 +61,33 @@ public class GraphView extends View {
         this.ySign = ySign;
     }
 
+    private void init() {
+        graphPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        graphPaint.setStyle(Paint.Style.STROKE);
+        graphPaint.setStrokeWidth(5);
+        coordinatesPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        coordinatesPaint.setStyle(Paint.Style.STROKE);
+        coordinatesPaint.setColor(Color.BLACK);
+        coordinatesPaint.setStrokeWidth(3);
+        coordinatesPaint.setTextSize(textSize);
+        stepPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        stepPaint.setStrokeWidth(2);
+        stepPaint.setStyle(Paint.Style.STROKE);
+        stepPaint.setColor(Color.DKGRAY);
+        stepPaint.setTextSize(stepTextSize);
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         drawCoordinates(canvas);
-
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(graphColor);
-        paint.setStrokeWidth(5);
-
-        Path path;
+        graphPaint.setColor(graphColor);
+        Path graphPath;
         if (isSmoothing) {
-            path = createSmoothPath();
+            graphPath = createSmoothPath();
         } else {
-            path = createPath();
+            graphPath = createPath();
         }
-
-        canvas.drawPath(path, paint);
+        canvas.drawPath(graphPath, graphPaint);
     }
 
     private Path createSmoothPath() {
@@ -91,10 +104,12 @@ public class GraphView extends View {
             float nextX = getPosX(x[i + 1]);
             float nextY = getPosY(y[i + 1]);
 
-            float startDiffX = nextX - getPosX(x[si(i - 1)]);
-            float startDiffY = nextY - getPosY(y[si(i - 1)]);
-            float endDiffX = getPosX(x[si(i + 2)]) - currentX;
-            float endDiffY = getPosY(y[si(i + 2)]) - currentY;
+            int n = (i == 0) ? 0 : (i - 1);
+            float startDiffX = nextX - getPosX(x[n]);
+            float startDiffY = nextY - getPosY(y[n]);
+            n = ((i + 2) > (size - 1)) ? (size - 1) : (i + 2);
+            float endDiffX = getPosX(x[n]) - currentX;
+            float endDiffY = getPosY(y[n]) - currentY;
 
             float firstControlX = currentX + (GRAPH_SMOOTHNESS * startDiffX);
             float firstControlY = currentY + (GRAPH_SMOOTHNESS * startDiffY);
@@ -104,15 +119,6 @@ public class GraphView extends View {
             path.cubicTo(firstControlX, firstControlY, secondControlX, secondControlY, nextX, nextY);
         }
         return path;
-    }
-
-    private int si(int i) {
-        if (i > coordinates.size() - 1) {
-            return coordinates.size() - 1;
-        } else if (i < 0) {
-            return 0;
-        }
-        return i;
     }
 
     private Path createPath() {
@@ -127,27 +133,15 @@ public class GraphView extends View {
     }
 
     private void drawCoordinates(Canvas canvas) {
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.BLACK);
-        paint.setStrokeWidth(3);
-        float textSize = 48;
-        paint.setTextSize(textSize);
         float left = getPaddingLeft(), top = getPaddingTop();
         float right = getWidth() - getPaddingRight();
         float bottom = getHeight() - getPaddingBottom();
-        canvas.drawRect(left, top, right, bottom, paint);
+        canvas.drawRect(left, top, right, bottom, coordinatesPaint);
         if (xSign != null && ySign != null) {
-            canvas.drawText(xSign, right - textSize, bottom, paint);
-            canvas.drawText(ySign, left, top + textSize, paint);
+            canvas.drawText(xSign, right - textSize, bottom, coordinatesPaint);
+            canvas.drawText(ySign, left, top + textSize, coordinatesPaint);
         }
         if (xStep != null && yStep != null) {
-            Paint stepPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            stepPaint.setStrokeWidth(2);
-            stepPaint.setStyle(Paint.Style.STROKE);
-            stepPaint.setColor(Color.DKGRAY);
-            float stepTextSize = 40;
-            stepPaint.setTextSize(stepTextSize);
             float lineSize = 24;
             float maxX = getMaxX();
             float x = getMinX();
