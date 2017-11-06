@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Tinkoff Fintech School</string>
+    <string name="task1">task 1</string>
+    <string name="task2">task 2</string>
+    <string name="task3">task 3</string>
+    <string name="task4">task 4</string>
 </resources>
