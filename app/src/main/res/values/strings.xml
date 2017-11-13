@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Tinkoff Fintech School</string>
+    <string name="value">value:</string>
+    <string name="ok">OK</string>
 </resources>
