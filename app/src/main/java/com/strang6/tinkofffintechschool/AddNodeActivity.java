@@ -14,7 +14,7 @@ public class AddNodeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_node);
-        valueEditText = (EditText) findViewById(R.id.valueEditText);
+        valueEditText = findViewById(R.id.valueEditText);
     }
 
     public void okOnClick(View view) {
@@ -22,9 +22,9 @@ public class AddNodeActivity extends AppCompatActivity {
         if (stringValue.isEmpty())
             Toast.makeText(this, "Введите value", Toast.LENGTH_SHORT).show();
         else {
-            NodeListViewModel viewModel = ViewModelProviders.of(this).get(NodeListViewModel.class);
             int value = Integer.parseInt(stringValue);
-            viewModel.addNode(new Node(value));
+            NodeDatabase nodeDatabase = new NodeDatabase(this);
+            nodeDatabase.addNode(value);
             this.setResult(RESULT_OK);
             finish();
         }

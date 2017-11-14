@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Tinkoff Fintech School</string>
-    <string name="value">value:</string>
+    <string name="value">value</string>
     <string name="ok">OK</string>
+    <string name="id">id</string>
+    <string name="add_relation">Добавить связь</string>
+    <string name="delete_relation">Удалить связь</string>
 </resources>
