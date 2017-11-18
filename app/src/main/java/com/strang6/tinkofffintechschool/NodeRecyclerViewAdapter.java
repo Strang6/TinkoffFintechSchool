@@ -41,6 +41,8 @@ public class NodeRecyclerViewAdapter extends RecyclerView.Adapter<NodeRecyclerVi
             holder.itemView.setBackgroundColor(Color.YELLOW);
         } else if (hasParent) {
             holder.itemView.setBackgroundColor(Color.BLUE);
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
         }
         holder.idTextView.setText(Long.toString(node.getId()));
         holder.valueTextView.setText(Integer.toString(node.getValue()));

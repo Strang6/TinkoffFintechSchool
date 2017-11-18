@@ -32,7 +32,11 @@ public class NodeDatabase {
     }
 
     public void deleteNode(Node node) {
+        long id = node.getId();
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        db.delete(RELATIONS_TABLE,
+                COLUMN_PARENT_ID + "=" + id + " OR "
+                        + COLUMN_CHILD_ID + "=" + id, null);
         db.delete(NODE_TABLE, COLUMN_ID + "=" + node.getId(), null);
         databaseHelper.close();
     }
@@ -73,9 +77,9 @@ public class NodeDatabase {
             Cursor relationsCursor = db.query(RELATIONS_TABLE, null, null,
                     null, null, null, null);
             if (relationsCursor.moveToFirst()) {
+                int parentIdIndex = relationsCursor.getColumnIndex(COLUMN_PARENT_ID);
+                int childIdIndex = relationsCursor.getColumnIndex(COLUMN_CHILD_ID);
                 do {
-                    int parentIdIndex = relationsCursor.getColumnIndex(COLUMN_PARENT_ID);
-                    int childIdIndex = relationsCursor.getColumnIndex(COLUMN_CHILD_ID);
                     long parentId = relationsCursor.getLong(parentIdIndex);
                     long childId = relationsCursor.getLong(childIdIndex);
                     Node.getNodeById(nodes, parentId).addChild(Node.getNodeById(nodes, childId));

@@ -1,7 +1,7 @@
 package com.strang6.tinkofffintechschool;
 
-
-import android.app.AlertDialog;
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -13,13 +13,9 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,12 +24,12 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RelationFragment extends Fragment implements View.OnLongClickListener, LoaderManager.LoaderCallbacks<List<Node>> {
+public class RelationFragment extends Fragment implements View.OnClickListener, LoaderManager.LoaderCallbacks<List<Node>> {
     public static final int TYPE_PARENT = 0, TYPE_CHILD = 1;
     private int type;
-    private long currentNodeId;
+    private long currentNodeId, selectedNodeId;
     private RelationRecyclerViewAdapter recyclerViewAdapter;
-    private static final int NODE_LOADER = 1;
+    private static final int NODE_LOADER = 1, REQ_ADD = 5, REQ_DELETE = 6;
 
     public static RelationFragment newInstance(int type, long nodeId) {
         RelationFragment relationFragment = new RelationFragment();
@@ -59,7 +55,7 @@ public class RelationFragment extends Fragment implements View.OnLongClickListen
         relationView.setHasFixedSize(true);
         relationView.setLayoutManager(new LinearLayoutManager(getContext()));
         relationView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-        recyclerViewAdapter = new RelationRecyclerViewAdapter(type, new ArrayList<Node>(), null, this);
+        recyclerViewAdapter = new RelationRecyclerViewAdapter(new ArrayList<Node>(), new ArrayList<Node>(),this);
         relationView.setAdapter(recyclerViewAdapter);
         Loader<List<Node>> loader = getLoaderManager().initLoader(NODE_LOADER, null, this);
         loader.forceLoad();
@@ -68,21 +64,45 @@ public class RelationFragment extends Fragment implements View.OnLongClickListen
 
 
     @Override
-    public boolean onLongClick(View view) {
-        long selectedNodeId = ((Node)view.getTag()).getId();
-        long childId = type == TYPE_PARENT ? currentNodeId : selectedNodeId;
-        long parentId = type == TYPE_PARENT ? selectedNodeId : currentNodeId;
+    public void onClick(View view) {
+        selectedNodeId = ((Node)view.getTag()).getId();
+        long childId, parentId;
+        if (type == TYPE_PARENT) {
+            childId = currentNodeId;
+            parentId = selectedNodeId;
+        } else {
+            childId = selectedNodeId;
+            parentId = currentNodeId;
+        }
         DialogFragment dialog;
         int type;
+        int req;
         ColorDrawable colorDrawable = (ColorDrawable)view.getBackground();
         if (colorDrawable!=null && colorDrawable.getColor() == Color.GREEN) {
             type = AlertDialogFragment.TYPE_DELETE;
+            req = REQ_DELETE;
         } else {
             type = AlertDialogFragment.TYPE_ADD;
+            req = REQ_ADD;
         }
         dialog = AlertDialogFragment.newInstance(type, parentId, childId);
+        dialog.setTargetFragment(this, req);
         dialog.show(getFragmentManager(), "dialog");
-        return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            getActivity().setResult(Activity.RESULT_OK);
+            switch (requestCode) {
+                case REQ_ADD:
+                    recyclerViewAdapter.addRelation(selectedNodeId);
+                    break;
+                case REQ_DELETE:
+                    recyclerViewAdapter.deleteRelation(selectedNodeId);
+                    break;
+            }
+        }
     }
 
     @Override
@@ -92,10 +112,17 @@ public class RelationFragment extends Fragment implements View.OnLongClickListen
 
     @Override
     public void onLoadFinished(Loader<List<Node>> loader, List<Node> nodes) {
-        Node node = Node.getNodeById(nodes, currentNodeId);
-        nodes.remove(node);
-        nodes.remove(node);
-        recyclerViewAdapter.setNodes(node, nodes);
+        Node currentNode = Node.getNodeById(nodes, currentNodeId);
+        List<Node> nodesWithRelation, nodesWithoutRelation;
+        nodesWithoutRelation = nodes;
+        nodesWithoutRelation.remove(currentNode);
+        if (type == TYPE_CHILD) {
+            nodesWithRelation = currentNode.getChildren();
+        } else {
+            nodesWithRelation = currentNode.getParents(nodesWithoutRelation);
+        }
+        nodesWithoutRelation.removeAll(nodesWithRelation);
+        recyclerViewAdapter.setNodes(nodesWithRelation, nodesWithoutRelation);
     }
 
     @Override

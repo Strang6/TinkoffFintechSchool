@@ -1,8 +1,10 @@
 package com.strang6.tinkofffintechschool;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
@@ -29,8 +31,8 @@ public class AlertDialogFragment extends DialogFragment {
         int type = getArguments().getInt(TYPE);
         final long parentId = getArguments().getLong(PARENT_ID);
         final long childId = getArguments().getLong(CHILD_ID);
-        String title = type == TYPE_ADD ? "Добавить связь" : "Удалить связь";
-        title = title + parentId + " - " + childId;
+        String title = type == TYPE_ADD ? "Добавить связь " : "Удалить связь ";
+        title = title + parentId + " - " + childId + "?";
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(title);
         builder.setNegativeButton("Нет", null);
@@ -41,6 +43,7 @@ public class AlertDialogFragment extends DialogFragment {
                 public void onClick(DialogInterface dialogInterface, int i) {
                     NodeDatabase db = new NodeDatabase(getActivity());
                     db.addRelation(parentId, childId);
+                    getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
                 }
             };
         } else {
@@ -49,6 +52,7 @@ public class AlertDialogFragment extends DialogFragment {
                 public void onClick(DialogInterface dialogInterface, int i) {
                     NodeDatabase db = new NodeDatabase(getActivity());
                     db.deleteRelation(parentId, childId);
+                    getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
                 }
             };
         }

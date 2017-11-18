@@ -1,6 +1,5 @@
 package com.strang6.tinkofffintechschool;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -22,11 +21,15 @@ public class AddNodeActivity extends AppCompatActivity {
         if (stringValue.isEmpty())
             Toast.makeText(this, "Введите value", Toast.LENGTH_SHORT).show();
         else {
-            int value = Integer.parseInt(stringValue);
-            NodeDatabase nodeDatabase = new NodeDatabase(this);
-            nodeDatabase.addNode(value);
-            this.setResult(RESULT_OK);
-            finish();
+            try {
+                int value = Integer.parseInt(stringValue);
+                NodeDatabase nodeDatabase = new NodeDatabase(this);
+                nodeDatabase.addNode(value);
+                this.setResult(RESULT_OK);
+                finish();
+            } catch (Exception e) {
+                Toast.makeText(this, "Неверное значение. Введите целое число.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

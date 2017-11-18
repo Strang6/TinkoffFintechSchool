@@ -64,4 +64,13 @@ public class Node {
         }
         return null;
     }
+
+    public List<Node> getParents(List<Node> nodes) {
+        List<Node> parents = new ArrayList<>();
+        for (Node node: nodes) {
+            if (node.getChildren().contains(this))
+                parents.add(node);
+        }
+        return parents;
+    }
 }

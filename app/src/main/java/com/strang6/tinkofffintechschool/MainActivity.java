@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private RecyclerView nodeRecyclerView;
     private NodeRecyclerViewAdapter recyclerViewAdapter;
-    private static final int NODE_LOADER = 1, ADD_CODE = 2;
+    private static final int NODE_LOADER = 1, ADD_CODE = 2, RELATION_CODE = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = new Intent(this, RelationActivity.class);
         Node node = (Node) view.getTag();
         intent.putExtra("nodeId", node.getId());
-        startActivity(intent);
+        startActivityForResult(intent, RELATION_CODE);
     }
 
     public void addNodeOnClick(View view) {
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ADD_CODE) {
+        if (requestCode == ADD_CODE || requestCode == RELATION_CODE) {
             if (resultCode == RESULT_OK) {
                 Loader<List<Node>> loader = getSupportLoaderManager().initLoader(NODE_LOADER, null, this);
                 loader.forceLoad();

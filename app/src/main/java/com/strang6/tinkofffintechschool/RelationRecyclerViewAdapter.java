@@ -15,16 +15,13 @@ import java.util.List;
 
 public class RelationRecyclerViewAdapter extends RecyclerView.Adapter<RelationRecyclerViewAdapter.ViewHolder> {
 
-    private List<Node> nodeList;
-    private View.OnLongClickListener clickListener;
-    private int type;
-    private Node currentNode;
+    private List<Node> nodesWithRelation, nodesWithoutRelation;
+    private View.OnClickListener clickListener;
 
-    public RelationRecyclerViewAdapter(int type, List<Node> nodeList, Node node, View.OnLongClickListener clickListener) {
-        this.type = type;
-        this.currentNode = node;
-        this.nodeList = nodeList;
+    public RelationRecyclerViewAdapter(List<Node> nodesWithRelation, List<Node> nodesWithoutRelation, View.OnClickListener clickListener) {
         this.clickListener = clickListener;
+        this.nodesWithoutRelation = nodesWithoutRelation;
+        this.nodesWithRelation = nodesWithRelation;
     }
 
     @Override
@@ -34,25 +31,42 @@ public class RelationRecyclerViewAdapter extends RecyclerView.Adapter<RelationRe
 
     @Override
     public void onBindViewHolder(RelationRecyclerViewAdapter.ViewHolder holder, int position) {
-        Node node = nodeList.get(position);
-        if (type == RelationFragment.TYPE_CHILD && currentNode.getChildren().contains(node) ||
-                type == RelationFragment.TYPE_PARENT && node.getChildren().contains(currentNode)) {
-                holder.itemView.setBackgroundColor(Color.GREEN);
+        Node node;
+        if (position < nodesWithRelation.size()) {
+            node = nodesWithRelation.get(position);
+            holder.itemView.setBackgroundColor(Color.GREEN);
+        } else {
+            node = nodesWithoutRelation.get(position - nodesWithRelation.size());
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
         }
         holder.idTextView.setText(Long.toString(node.getId()));
         holder.valueTextView.setText(Integer.toString(node.getValue()));
-        holder.itemView.setOnLongClickListener(clickListener);
+        holder.itemView.setOnClickListener(clickListener);
         holder.itemView.setTag(node);
     }
 
     @Override
     public int getItemCount() {
-        return nodeList.size();
+        return nodesWithRelation.size() + nodesWithoutRelation.size();
     }
 
-    public void setNodes(Node node, List<Node> nodeList) {
-        this.currentNode = node;
-        this.nodeList = nodeList;
+    public void setNodes(List<Node> nodesWithRelation, List<Node> nodesWithoutRelation) {
+        this.nodesWithRelation = nodesWithRelation;
+        this.nodesWithoutRelation = nodesWithoutRelation;
+        notifyDataSetChanged();
+    }
+
+    public void addRelation(long nodeId) {
+        Node node = Node.getNodeById(nodesWithoutRelation, nodeId);
+        nodesWithoutRelation.remove(node);
+        nodesWithRelation.add(node);
+        notifyDataSetChanged();
+    }
+
+    public void deleteRelation(long nodeId) {
+        Node node = Node.getNodeById(nodesWithRelation, nodeId);
+        nodesWithRelation.remove(node);
+        nodesWithoutRelation.add(node);
         notifyDataSetChanged();
     }
 
